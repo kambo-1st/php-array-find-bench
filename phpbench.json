@@ -1,0 +1,46 @@
+{
+  "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+  "runner.bootstrap": "vendor/autoload.php",
+  "runner.path": "Benchmark",
+  "runner.php_config" : {
+    "opcache.optimization_level": "8192M"
+  },
+  "report.generators": {
+    "all_aggregate": {
+      "title": "Cosine similarity call comparison",
+      "description": "Cosine similarity call comparison",
+      "generator": "component",
+      "filter": "contains(subject_groups, 'cosine_similarity')",
+      "components": [
+        {
+          "component": "bar_chart_aggregate",
+          "x_partition" : ["subject_name", "variant_name"],
+          "bar_partition": "benchmark_name",
+          "y_expr": "mode(partition['result_time_avg']) as time",
+          "y_axes_label": "yValue as time"
+        },
+        {
+          "component": "section",
+          "tabbed": true,
+          "partition": ["benchmark_name"],
+          "components": [
+            {
+              "title": "{{ first(frame['benchmark_name']) }}",
+              "component": "table_aggregate",
+              "partition": ["subject_name", "variant_name"],
+              "row": {
+                "variant": "first(partition['subject_name'])",
+                "memory": "first(partition['result_mem_peak']) as memory",
+                "min": "min(partition['result_time_avg']) as time",
+                "max": "max(partition['result_time_avg']) as time",
+                "mode": "mode(partition['result_time_avg']) as time",
+                "rstdev": "rstdev(partition['result_time_avg'])",
+                "stdev": "stdev(partition['result_time_avg']) as time"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
